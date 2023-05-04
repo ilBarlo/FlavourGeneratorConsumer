@@ -5,8 +5,9 @@ import (
 	"log"
 )
 
+// Function that start a new Consumer on a RabbitMQ Channel
 func StartConsumer(queueName string, url string) error {
-	// definisce il canale RabbitMQ
+
 	conn, ch, err := createChannel(url)
 	if err != nil {
 		return fmt.Errorf("failed to create channel: %v", err)
@@ -14,19 +15,16 @@ func StartConsumer(queueName string, url string) error {
 	defer ch.Close()
 	defer conn.Close()
 
-	// definisce la coda su cui il consumer ascolterà i messaggi
 	err = declareQueue(ch, queueName)
 	if err != nil {
 		return fmt.Errorf("failed to declare queue: %v", err)
 	}
 
-	// si mette in ascolto sulla coda
 	msgs, err := consumeMsgs(ch, queueName)
 	if err != nil {
 		return fmt.Errorf("failed to consume messages: %v", err)
 	}
 
-	// loop infinito che legge i messaggi che arrivano sulla coda
 	forever := make(chan bool)
 	go func() {
 		for d := range msgs {

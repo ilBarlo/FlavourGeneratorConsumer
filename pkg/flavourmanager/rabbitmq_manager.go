@@ -42,10 +42,11 @@ func declareQueue(ch *amqp.Channel, queueName string) error {
 	return nil
 }
 
+// Function to consume messages arrived on a RabbitMQ Channel
 func consumeMsgs(ch *amqp.Channel, qName string) (<-chan amqp.Delivery, error) {
-	// si mette in ascolto sulla coda per i messaggi
+
 	msgs, err := ch.Consume(
-		qName, // nome della coda
+		qName, // queue name
 		"",    // consumer
 		true,  // auto-ack
 		false, // exclusive
@@ -60,6 +61,7 @@ func consumeMsgs(ch *amqp.Channel, qName string) (<-chan amqp.Delivery, error) {
 	return msgs, nil
 }
 
+// Function that handleMsg
 func handleMsg(body []byte) {
 	var nodeInfo NodeInfo
 	err := json.Unmarshal(body, &nodeInfo)
