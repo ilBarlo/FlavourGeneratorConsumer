@@ -10,7 +10,7 @@ import (
 
 var nodeMap = make(NodeMap)
 
-// Function to create RabbitMQ Channel
+// createChannel creates a RabbitMQ Channel
 func createChannel(url string) (*amqp.Connection, *amqp.Channel, error) {
 	// Connection to the server RabbitMQ
 	conn, err := amqp.Dial(url)
@@ -25,7 +25,7 @@ func createChannel(url string) (*amqp.Connection, *amqp.Channel, error) {
 	return conn, ch, nil
 }
 
-// Function to declare a queue on a RabbitMQ Channel
+// declareQueue declares a queue on a RabbitMQ Channel
 func declareQueue(ch *amqp.Channel, queueName string) error {
 
 	_, err := ch.QueueDeclare(
@@ -42,7 +42,7 @@ func declareQueue(ch *amqp.Channel, queueName string) error {
 	return nil
 }
 
-// Function to consume messages arrived on a RabbitMQ Channel
+// consumeMsgs consumes messages arrived on a RabbitMQ Channel
 func consumeMsgs(ch *amqp.Channel, qName string) (<-chan amqp.Delivery, error) {
 
 	msgs, err := ch.Consume(
@@ -61,7 +61,7 @@ func consumeMsgs(ch *amqp.Channel, qName string) (<-chan amqp.Delivery, error) {
 	return msgs, nil
 }
 
-// Function that handleMsg
+// handleMsg handles the message received
 func handleMsg(body []byte) {
 	var nodeInfo NodeInfo
 	err := json.Unmarshal(body, &nodeInfo)
