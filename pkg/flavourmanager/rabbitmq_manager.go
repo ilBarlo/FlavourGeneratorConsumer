@@ -8,7 +8,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-var nodeMap = make(NodeMap)
+var flavourMap = make(FlavourMap)
 
 // createChannel creates a RabbitMQ Channel
 func createChannel(url string) (*amqp.Connection, *amqp.Channel, error) {
@@ -63,13 +63,13 @@ func consumeMsgs(ch *amqp.Channel, qName string) (<-chan amqp.Delivery, error) {
 
 // handleMsg handles the message received
 func handleMsg(body []byte) {
-	var nodeInfo NodeInfo
-	err := json.Unmarshal(body, &nodeInfo)
+	var flavour Flavour
+	err := json.Unmarshal(body, &flavour)
 	if err != nil {
 		log.Printf("failed to unmarshal JSON: %v", err)
 		return
 	}
 
-	updateNodeMap(nodeMap, nodeInfo)
+	updateFlavourMap(flavourMap, flavour)
 
 }
