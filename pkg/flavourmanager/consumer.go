@@ -1,39 +1,39 @@
 package flavourmanager
 
 import (
-	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
+
+	"github.com/nats-io/nats.go"
 )
 
 // Function that start a new Consumer on a RabbitMQ Channel
-func StartConsumer(queueName string, url string) error {
+func StartConsumer(subject string, url string) error {
 
-	conn, ch, err := createChannel(url)
+	nc, err := connectNATS(url)
 	if err != nil {
-		return fmt.Errorf("failed to create channel: %w", err)
-	}
-	defer ch.Close()
-	defer conn.Close()
-
-	err = declareQueue(ch, queueName)
-	if err != nil {
-		return fmt.Errorf("failed to declare queue: %w", err)
+		log.Fatal(err)
 	}
 
-	msgs, err := consumeMsgs(ch, queueName)
+	// Subscribe to a topic
+	sub, err := nc.Subscribe(subject, func(msg *nats.Msg) {
+		handleMsg(msg.Data)
+	})
 	if err != nil {
-		return fmt.Errorf("failed to consume messages: %w", err)
+		log.Fatal(err)
 	}
+	defer sub.Unsubscribe()
 
-	forever := make(chan bool)
-	go func() {
-		for d := range msgs {
-			handleMsg(d.Body)
-		}
-	}()
+	log.Println("Consumer started. Waiting for messages...")
 
-	log.Printf(" [*] Waiting for messages...")
-	<-forever
+	// Wait for SIGINT or SIGTERM to gracefully shutdown the application
+	sigChan := make(chan os.Signal, 1)
+	signal.Notify(sigChan, syscall.SIGINT, syscall.SIGTERM)
+	<-sigChan
+
+	log.Println("Shutting down consumer...")
 
 	return nil
 }
