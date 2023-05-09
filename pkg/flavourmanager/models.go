@@ -2,6 +2,7 @@ package flavourmanager
 
 import (
 	"fmt"
+	"reflect"
 )
 
 const (
@@ -44,7 +45,8 @@ func updateFlavourMap(flavourMap FlavourMap, newFlavour Flavour) {
 		fmt.Printf("  Plans:%s\n", newFlavour.PodsOffer)
 
 		fmt.Printf("\nOffer of node %s added!\n", newFlavour.Name)
-	} else {
+		upsertFlavour(&newFlavour)
+	} else if !reflect.DeepEqual(newFlavour, existingFlavour) {
 		// The node already exists, check if there is some changes
 		existingFlavour.Name = newFlavour.Name
 		existingFlavour.Architecture = newFlavour.Architecture
@@ -65,5 +67,6 @@ func updateFlavourMap(flavourMap FlavourMap, newFlavour Flavour) {
 		fmt.Printf("  Plans:%s\n", newFlavour.PodsOffer)
 
 		fmt.Printf("\nOffer of flavour %s updated!\n", newFlavour.Name)
+		upsertFlavour(&newFlavour)
 	}
 }
