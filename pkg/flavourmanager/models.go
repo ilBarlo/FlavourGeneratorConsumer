@@ -13,13 +13,20 @@ const (
 
 // Flavour represents a subset of a node's resources
 type Flavour struct {
-	UID             string `json:"uid"`
-	Name            string `json:"name"`
-	Architecture    string `json:"architecture"`
-	OperatingSystem string `json:"os"`
-	CPUOffer        string `json:"cpuOffer"`
-	MemoryOffer     string `json:"memoryOffer"`
-	PodsOffer       []Plan `json:"podsOffer"`
+	UID             string     `json:"uid"`
+	Name            string     `json:"name"`
+	Architecture    string     `json:"architecture"`
+	OperatingSystem string     `json:"os"`
+	CPUOffer        string     `json:"cpuOffer"`
+	MemoryOffer     string     `json:"memoryOffer"`
+	PodsOffer       []PodsPlan `json:"podsOffer"`
+}
+
+// PodsPlan represents a plan for which is possibile to have a specific amount of available pods
+type PodsPlan struct {
+	Name      string `json:"name"`
+	Available bool   `json:"available"`
+	Pods      int64  `json:"availablePods"`
 }
 
 // FlavourMap represents a Map of nodes
@@ -41,8 +48,6 @@ func updateFlavourMap(flavourMap FlavourMap, newFlavour Flavour) {
 		fmt.Printf("Operating System: %s\n", newFlavour.OperatingSystem)
 		fmt.Printf("CPU: %s\n", newFlavour.CPUOffer)
 		fmt.Printf("Memory: %s\n", newFlavour.MemoryOffer)
-		fmt.Printf("PodsOffer:\n")
-		fmt.Printf("  Plans:%s\n", newFlavour.PodsOffer)
 
 		fmt.Printf("\nOffer of node %s added!\n", newFlavour.Name)
 		upsertFlavour(&newFlavour)
@@ -64,7 +69,6 @@ func updateFlavourMap(flavourMap FlavourMap, newFlavour Flavour) {
 		fmt.Printf("CPU: %s\n", newFlavour.CPUOffer)
 		fmt.Printf("Memory: %s\n", newFlavour.MemoryOffer)
 		fmt.Printf("PodsOffer:\n")
-		fmt.Printf("  Plans:%s\n", newFlavour.PodsOffer)
 
 		fmt.Printf("\nOffer of flavour %s updated!\n", newFlavour.Name)
 		upsertFlavour(&newFlavour)

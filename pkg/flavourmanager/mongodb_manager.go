@@ -16,8 +16,7 @@ const colName = "resources"
 
 var collection *mongo.Collection
 
-// init connect with mongoDB
-
+// init used for connecting with mongoDB
 func init() {
 	// Client option
 	clientOptions := options.Client().ApplyURI(connectionString)

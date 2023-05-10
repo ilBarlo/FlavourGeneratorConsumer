@@ -10,15 +10,15 @@ import (
 )
 
 // Function that start a new Consumer on a RabbitMQ Channel
-func StartConsumer(subject string, url string) error {
+func StartConsumer(subject1 string, url string) error {
 
 	nc, err := connectNATS(url)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	// Subscribe to a topic
-	sub, err := nc.Subscribe(subject, func(msg *nats.Msg) {
+	// Subscribe to the topic that manage flavours
+	sub, err := nc.Subscribe(subject1, func(msg *nats.Msg) {
 		handleMsg(msg.Data)
 	})
 	if err != nil {
