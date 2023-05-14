@@ -9,7 +9,7 @@ import (
 	"github.com/nats-io/nats.go"
 )
 
-// Function that start a new Consumer on a RabbitMQ Channel
+// StartConsumer starts a new Consumer on a RabbitMQ Channel
 func StartConsumer(subject1 string, url string) error {
 
 	nc, err := connectNATS(url)
