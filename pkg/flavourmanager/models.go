@@ -5,39 +5,72 @@ import (
 	"reflect"
 )
 
-// NodeInfo represents a node and its resources
-type NodeInfo struct {
-	UID             string          `json:"uid"`
-	Name            string          `json:"name"`
-	Architecture    string          `json:"architecture"`
-	OperatingSystem string          `json:"os"`
-	ResourceMetrics ResourceMetrics `json:"resources"`
+const (
+	Small  Plan = "Small: 11"
+	Medium Plan = "Medium: 33"
+	Large  Plan = "Large: 66"
+)
+
+// Flavour represents a subset of a node's resources
+type Flavour struct {
+	UID             string     `json:"uid"`
+	Name            string     `json:"name"`
+	Architecture    string     `json:"architecture"`
+	OperatingSystem string     `json:"os"`
+	CPUOffer        string     `json:"cpuOffer"`
+	MemoryOffer     string     `json:"memoryOffer"`
+	PodsOffer       []PodsPlan `json:"podsOffer"`
 }
 
-// ResourceMetrics represents resources of a certain node
-type ResourceMetrics struct {
-	CPUTotal        string `json:"totalCPU"`
-	CPUAvailable    string `json:"availableCPU"`
-	MemoryTotal     string `json:"totalMemory"`
-	MemoryAvailable string `json:"availableMemory"`
+// PodsPlan represents a plan for which is possibile to have a specific amount of available pods
+type PodsPlan struct {
+	Name      string `json:"name"`
+	Available bool   `json:"available"`
+	Pods      int64  `json:"availablePods"`
 }
 
-// NodeMap represents a Map of nodes
-type NodeMap map[string]NodeInfo
+// FlavourMap represents a Map of nodes
+type FlavourMap map[string]Flavour
 
-// updateNodeMap updates the NodeMap
-func updateNodeMap(nodeMap NodeMap, newNode NodeInfo) {
-	if existingNode, ok := nodeMap[newNode.UID]; !ok {
+// Plan represents a specific Plan for each flavour depending the number of pods
+type Plan string
+
+// updateFlavourMap updates the FlavourMap
+func updateFlavourMap(flavourMap FlavourMap, newFlavour Flavour) {
+	if existingFlavour, ok := flavourMap[newFlavour.UID]; !ok {
 		// The node is new, add it to the map
-		nodeMap[newNode.UID] = newNode
-		fmt.Printf("Metrics of node %s added!\n", newNode.Name)
-	} else if !reflect.DeepEqual(newNode, existingNode) {
+		flavourMap[newFlavour.UID] = newFlavour
+
+		// FOR DEBUG: After the implementation delete this part
+
+		fmt.Printf("\nFlavour: %s \n", newFlavour.Name)
+		fmt.Printf("Architecture: %s\n", newFlavour.Architecture)
+		fmt.Printf("Operating System: %s\n", newFlavour.OperatingSystem)
+		fmt.Printf("CPU: %s\n", newFlavour.CPUOffer)
+		fmt.Printf("Memory: %s\n", newFlavour.MemoryOffer)
+
+		fmt.Printf("\nOffer of node %s added!\n", newFlavour.Name)
+		upsertFlavour(&newFlavour)
+	} else if !reflect.DeepEqual(newFlavour, existingFlavour) {
 		// The node already exists, check if there is some changes
-		existingNode.Name = newNode.Name
-		existingNode.Architecture = newNode.Architecture
-		existingNode.OperatingSystem = newNode.OperatingSystem
-		existingNode.ResourceMetrics = newNode.ResourceMetrics
-		nodeMap[newNode.UID] = existingNode
-		fmt.Printf("Metrics of node %s updated!\n", newNode.Name)
+		existingFlavour.Name = newFlavour.Name
+		existingFlavour.Architecture = newFlavour.Architecture
+		existingFlavour.OperatingSystem = newFlavour.OperatingSystem
+		existingFlavour.CPUOffer = newFlavour.CPUOffer
+		existingFlavour.MemoryOffer = newFlavour.MemoryOffer
+		existingFlavour.PodsOffer = newFlavour.PodsOffer
+		flavourMap[newFlavour.UID] = existingFlavour
+
+		// FOR DEBUG: After the implementation delete this part
+
+		fmt.Printf("\nFlavour: %s\n", newFlavour.Name)
+		fmt.Printf("Architecture: %s\n", newFlavour.Architecture)
+		fmt.Printf("Operating System: %s\n", newFlavour.OperatingSystem)
+		fmt.Printf("CPU: %s\n", newFlavour.CPUOffer)
+		fmt.Printf("Memory: %s\n", newFlavour.MemoryOffer)
+		fmt.Printf("PodsOffer:\n")
+
+		fmt.Printf("\nOffer of flavour %s updated!\n", newFlavour.Name)
+		upsertFlavour(&newFlavour)
 	}
 }
